@@ -3,6 +3,9 @@ pipeline {
        node {
          label "build"
       }
+       environment {
+        PATH="$PATH:/opt/apache-maven-3.8.8/bin"
+      }     
     }
     stages {
         stage('Build') {
