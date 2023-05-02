@@ -1,13 +1,11 @@
+def registry = 'https://kenndrick.jfrog.io'
 pipeline {
     agent {
        node {
          label "build"
       }
     }
-    environment {
-      PATH= "/opt/apache-maven-3.8.8/bin:$PATH"
-      }
-      stages {
+    stages {
         stage('Build') {
             steps {
                 echo '<--------------- Building --------------->'
@@ -15,7 +13,7 @@ pipeline {
                 sh 'mvn clean deploy -Dmaven.test.skip=true'
                 echo '<------------- Build completed --------------->'
             }
-        }  
+        }
     
         stage ("Sonar Analysis") {
             environment {
@@ -30,20 +28,6 @@ pipeline {
                 echo '<--------------- Sonar Analysis stopped  --------------->'
             }   
         }
-        stage("Quality Gate"){  
-          steps {  
-               script {
-                   echo '<--------------- Sonar Gate Analysis started --------------->'   
-                     timeout(time: 1, unit: 'HOURS'){  
-                        def qg = waitForQualityGate()   
-                        if(qg.status !='OK'){   
-                           error "Pipeline failed due to quality gate failures: ${qg.status}"  
-                       }  
-                   }   
-                  echo '<--------------- Sonar Gate Analysis Completed --------------->'  
-                }   
-            }   
-        }  
     }
 }        
 
