@@ -1,4 +1,6 @@
 def registry = 'https://kenndrick.jfrog.io'
+def imageName = 'kenndrick.jfrog.io/default-docker/valaxy-rtp'
+def version   = '2.0.2'
 pipeline {
     agent {
        node {
@@ -75,6 +77,26 @@ pipeline {
                   echo '<--------------- Sonar Gate Analysis Completed --------------->'  
                 }   
             }   
+        }
+        stage(" Docker Build ") {
+          steps {
+            script {
+               echo '<--------------- Docker Build Started --------------->'
+               app = docker.build(imageName+":"+version)
+               echo '<--------------- Docker Build Ends --------------->'
+            }
+          }
+        }
+         stage (" Docker Publish "){
+            steps {
+                script {
+                   echo '<--------------- Docker Publish Started --------------->'  
+                    docker.withRegistry(registry, 'dockercredentialid'){
+                        app.push()
+                    }    
+                   echo '<--------------- Docker Publish Ended --------------->'  
+                }
+            }
         }  
     }
 }        
